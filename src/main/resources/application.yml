@@ -1,0 +1,22 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mybatis_plus?characterEncoding=utf-8&useSSL=false&serverTimezone=Hongkong
+    username: root
+    password: 2016jbbb
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      max-active: 100
+      initial-size: 1
+      max-wait: 60000
+      min-idle: 1
+
+# MybatisProperties
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.mybatis.demo1.entity
+#  延迟加载,降低运行消耗，提高查询效率
+  configuration:
+    lazy-loading-enabled: true

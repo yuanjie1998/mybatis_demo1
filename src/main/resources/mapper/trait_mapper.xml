@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.demo1.dao.TraitDao">
+<!--    新增水果特征数据-->
+    <insert id="insertTrait" parameterType="List">
+        INSERT trait (id,shape,fruits_id) VALUES 
+        <foreach collection="list" item="oj" separator=",">
+            (#{oj.id},#{oj.shape},#{oj.fruits_id})
+        </foreach>
+    </insert>
+</mapper>

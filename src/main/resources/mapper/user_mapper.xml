@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.demo1.dao.UserDao">
+    <sql id="selectFile">
+        id,name,age,hobby
+    </sql>
+
+    <sql id="insertFile">
+        name,age,hobby
+    </sql>
+
+    <select id="selectAll" resultType="user">
+        SELECT <include refid="selectFile"/>
+         FROM `user`
+    </select>
+
+    <insert id="insertUser" parameterType="user">
+        INSERT INTO `user` (<include refid="insertFile"/>) VALUES (#{name}, #{age}, #{hobby})
+    </insert>
+
+    <delete id="deleteUser" parameterType="Integer">
+        delete from user where id = #{id}
+    </delete>
+
+    <update id="updateUser" parameterType="user">
+        UPDATE `user` 
+        <set>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="age != null and age != ''">
+                age = #{age},
+            </if>
+            <if test="hobby != null and hobby != ''">
+                hobby = #{hobby}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+<!--    模糊查询  _parameter 固定名字-->
+    <select id="selectSomeUser" parameterType="String" resultType="user">
+        <bind name="pattern_name" value="'%'+_parameter+'%'"/>
+        select <include refid="selectFile"/>
+        from user
+        where name like #{pattern_name}
+    </select>
+
+<!--    根据姓名或者年龄查询 resultType  的值首字母大小写都行-->
+    <select id="findOneUser" resultType="User">
+        select <include refid="selectFile"/>
+        from user
+        <where>
+            <if test="name != null and name !=''">
+                and name = #{name}
+            </if>
+            <if test="age != null and age !=''">
+                and age = #{age}
+            </if>
+        </where>
+    </select>
+
+<!--    <foreach>元素参数为list collection:list是传入的参数类型(首字母小写，可以是array,list,Map的键)，
+          item：循环中当前元素(值)  index：当前元素在集合的位置下标（键）     -->
+    <select id="findAllByIds" parameterType="List" resultType="User">
+        select * from user where id in
+        <foreach collection="list" item="item" index="index"
+                 open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+<!--    <foreach>元素参数为map中的list集合  resultMap-对象属性名与数据库字段名不一致时(1:1、1：m)
+        collection：map中的键，item为当前循环的值故#中为item-->
+    <resultMap id="findByMap" type="User">
+        <id property="id" column="id"></id>
+        <result property="name" column="name"></result>
+        <result property="age" column="age"></result>
+        <result property="hobby" column="hobby"></result>
+    </resultMap>
+    <select id="findAllByMap" parameterType="Map" resultMap="findByMap">
+        select * from user where id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+</mapper>

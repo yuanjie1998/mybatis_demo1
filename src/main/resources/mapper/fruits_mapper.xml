@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.demo1.dao.FruitsDao">
+<!--    1.新增水果 useGeneratedKeys="true" keyProperty="id" 插入一条数据返回 id主键值到指定字段-->
+    <insert id="insertFruits" parameterType="fruits" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO fruits (id,`name`,storeDate)
+        VALUES (#{id},#{name},#{storeDate})
+    </insert>
+<!--    2.根据id查询水果，card的id取别名c_id为的是与fruits的id值区分 1:1关系
+        -->
+    <resultMap id="selectFruits" type="fruits">
+        <id property="id" column="id"></id>
+        <result property="name" column="name"></result>
+        <result property="storeDate" column="storeDate"></result>
+<!--        1:1关系-->
+        <association property="card" javaType="card">
+            <id property="id" column="c_id"></id>
+            <result property="location" column="location"></result>
+            <result property="fruits_id" column="fruits_id"></result>
+        </association>
+    </resultMap>
+    <select id="selectAllFruits" resultMap="selectFruits">
+        SELECT f.id,f.name,f.storeDate,c.id c_id,c.location,c.fruits_id
+         FROM fruits f,card c
+         WHERE f.id = #{id} AND f.id = c.fruits_id
+    </select>
+
+<!--    3.通过Fruits的id值查找特征的值 1：n 关系-->
+    <select id="selectTraitById" resultMap="selectTrait">
+        SELECT f.*,t.id t_id,t.shape,t.fruits_id
+        FROM fruits f,card c,trait t
+        WHERE f.id = t.fruits_id AND f.id = #{id}
+    </select>
+    <resultMap id="selectTrait" type="fruits">
+        <id property="id" column="id"></id>
+        <result property="name" column="name"></result>
+        <result property="storeDate" column="storeDate"></result>
+        <collection property="traits" ofType="trait">
+            <id property="id" column="t_id"></id>
+            <result property="shape" column="shape"></result>
+            <result property="fruits_id" column="fruits_id"></result>
+        </collection>
+    </resultMap>
+
+
+</mapper>
